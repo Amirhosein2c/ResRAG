@@ -21,7 +21,6 @@ The app should use RAG (Retrieval-Augmented Generation) techniques to return rel
 for embedding, not two.
 > - You can store metadata for each resume to provide better results when users
 query them.
-> \
 <br>
 
 - Query Interface: 
