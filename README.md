@@ -17,13 +17,11 @@ The app should use RAG (Retrieval-Augmented Generation) techniques to return rel
 <br>
 
 > [!NOTE]
-> If the user uploads the resume twice, only one request should be sent to the LLM
+> - If the user uploads the resume twice, only one request should be sent to the LLM
 for embedding, not two.
-<br>
-
-> [!NOTE]
-> You can store metadata for each resume to provide better results when users
+> - You can store metadata for each resume to provide better results when users
 query them.
+> \
 <br>
 
 - Query Interface: 
