@@ -1,0 +1,766 @@
+So, I need to perform a programming task by the day after tomorrow, here is the detail of the task"
+
+Build a RAG-Based Resume Search Tool
+Objective
+Design and build a prototype application that allows an HR specialist to search and explore a pool
+of resumes using natural language queries. The app should use RAG (Retrieval-Augmented
+Generation) techniques to return relevant resume profiles, even if the query terms are not exact
+keyword matches.
+Requirements
+1. Core Functionality
+• Upload CVs: Allow users to upload multiple CVs (PDF, DOCX, or TXT format).
+• Data Extraction: Extract text content from the uploaded resumes (in PDF format).
+• Indexing: Vectorize and store the resumes using embeddings (e.g., OpenAI).
+◦ Note: If the user uploads the resume twice, only one request should be sent to the LLM
+for embedding, not two.
+◦ Note: You can store metadata for each resume to provide better results when users
+query them.
+• Query Interface: Allow the HR user to enter natural language queries like:
+◦ “Looking for a data scientist with Python and TensorFlow experience in Germany”
+◦ “Looking for a data scientist with Python and Pytorch experience in Iran”
+◦ “Frontend developer with a React portfolio and a CS degree”
+• RAG Retrieval:
+◦ Retrieve top-K relevant CVs using vector similarity.
+◦ Use an LLM to generate a short summary or justification of why each CV is a match.
+2. UI
+• Build a basic Streamlit interface:
+◦ Upload resumes
+◦ Enter search query
+◦ Display matching CVs with summary/justification from the LLM
+3. Tech Stack
+• Frontend: Python (Streamlit)
+• Backend: Python (Streamlit)
+• Database: Milvus / ChromaDB / Elasticsearch / or any vector DB | Also use Redis for
+caching.
+• AI Capabilities: Use an embedding model (e.g., text-embedding-3-small) to vectorize CVs
+and queries, Use an LLM to generate human-readable summaries of match relevance
+Deliverables
+• A GitHub repo (or ZIP) containing:
+◦ Dockerize Project
+◦ Requirements file (e.g., requirements.txt)
+◦ README with setup and usage instructions
+• A small sample dataset (3–5 anonymized CVs) along with corresponding queries, intended
+for demonstration purposes.
+
+Could you please do me a favor and make 10 random related resume from 10 hypothetical people that I could use them in the project?
+Could you consider the fact that all these people are from Iran (so their name and lastname should be Persian names) and live in Iran, but they could be from different cities, lets say 6 of them live in Tehran, two of them in Karaj, and the rest in different other cities. 
+The second point is, could you please make 4 of the resumes written in Farsi?
+And the last point, could you diversify the structure formats (templates) of the resumes diverse?
+
+
+#######################################################################################################
+
+
+# Sample Iranian Resumes for RAG Search Tool
+
+## Resume 1: Reza Ahmadi (Tehran) - Software Engineer
+**Format: Traditional**
+
+---
+
+**REZA AHMADI**
+Software Engineer
+📧 reza.ahmadi@email.com | 📱 +98 912 345 6789
+📍 Tehran, Iran | 🔗 linkedin.com/in/rezaahmadi
+
+### PROFESSIONAL SUMMARY
+Experienced software engineer with 5+ years developing scalable web applications using Python, Django, and React. Passionate about clean code and agile methodologies.
+
+### WORK EXPERIENCE
+
+**Senior Software Engineer** | TechCorp Iran | Tehran | 2022 - Present
+- Developed microservices architecture serving 100K+ daily users
+- Led team of 4 developers in building e-commerce platform
+- Implemented CI/CD pipelines reducing deployment time by 60%
+- Technologies: Python, Django, React, PostgreSQL, Docker, AWS
+
+**Software Engineer** | StartupHub | Tehran | 2019 - 2022
+- Built REST APIs for mobile applications
+- Optimized database queries improving performance by 40%
+- Collaborated with cross-functional teams using Scrum methodology
+- Technologies: Python, Flask, MySQL, Redis
+
+### EDUCATION
+**Bachelor of Computer Engineering** | Sharif University of Technology | Tehran | 2015-2019
+- GPA: 3.7/4.0
+- Relevant Coursework: Data Structures, Algorithms, Database Systems
+
+### SKILLS
+- **Programming:** Python, JavaScript, Java, C++
+- **Frameworks:** Django, Flask, React, Node.js
+- **Databases:** PostgreSQL, MySQL, MongoDB, Redis
+- **DevOps:** Docker, Kubernetes, AWS, CI/CD
+- **Tools:** Git, JIRA, Postman
+
+### PROJECTS
+- **E-commerce Platform:** Led development of scalable online marketplace
+- **Data Pipeline:** Built ETL pipeline processing 1M+ records daily
+
+---
+
+## Resume 2: Maryam Hosseini (Tehran) - Data Scientist
+**Format: Modern**
+
+---
+
+# MARYAM HOSSEINI
+## Data Scientist & Machine Learning Engineer
+
+**Contact:** maryam.hosseini@email.com | +98 935 123 4567  
+**Location:** Tehran, Iran  
+**LinkedIn:** linkedin.com/in/maryamhosseini  
+**GitHub:** github.com/maryamhosseini
+
+---
+
+## 🎯 PROFESSIONAL SUMMARY
+Data scientist with 4+ years of experience in machine learning, deep learning, and statistical analysis. Expertise in Python, TensorFlow, and PyTorch with proven track record of delivering insights from complex datasets.
+
+---
+
+## 💼 EXPERIENCE
+
+### **Lead Data Scientist** | FinTech Solutions | Tehran
+*March 2022 - Present*
+- Developed fraud detection models reducing false positives by 35%
+- Built recommendation system increasing user engagement by 25%
+- Led ML team of 3 data scientists
+- **Tech Stack:** Python, TensorFlow, scikit-learn, Pandas, Apache Spark
+
+### **Data Scientist** | Analytics Corp | Tehran
+*January 2020 - February 2022*
+- Created predictive models for customer churn analysis
+- Implemented NLP solutions for sentiment analysis
+- Collaborated with product teams to define KPIs
+- **Tech Stack:** Python, PyTorch, NLTK, Matplotlib, SQL
+
+---
+
+## 🎓 EDUCATION
+
+**Master of Science in Computer Science** | University of Tehran | 2018-2020
+- Thesis: "Deep Learning Applications in Persian Text Classification"
+- GPA: 3.8/4.0
+
+**Bachelor of Mathematics** | Shahid Beheshti University | Tehran | 2014-2018
+
+---
+
+## 🛠️ TECHNICAL SKILLS
+
+**Programming Languages:** Python, R, SQL, Java  
+**ML/DL Frameworks:** TensorFlow, PyTorch, scikit-learn, Keras  
+**Data Processing:** Pandas, NumPy, Apache Spark  
+**Visualization:** Matplotlib, Seaborn, Plotly  
+**Cloud Platforms:** AWS, Google Cloud  
+**Databases:** PostgreSQL, MongoDB, Elasticsearch
+
+---
+
+## 🏆 ACHIEVEMENTS
+- Published 3 papers in international ML conferences
+- Winner of Tehran AI Hackathon 2021
+- Certified TensorFlow Developer
+
+---
+
+## Resume 3: علی رضایی (Ali Rezaei) - Karaj - Frontend Developer
+**Format: Farsi Resume**
+
+---
+
+# علی رضایی
+## توسعه‌دهنده فرانت‌اند
+
+**تماس:** ali.rezaei@email.com | ۰۹۱۲ ۳۴۵ ۶۷۸۹+  
+**آدرس:** کرج، ایران  
+**لینکدین:** linkedin.com/in/alirezaei  
+**گیت‌هاب:** github.com/alirezaei
+
+---
+
+## خلاصه شغلی
+توسعه‌دهنده فرانت‌اند با ۳+ سال تجربه در React، Vue.js و JavaScript. علاقه‌مند به طراحی رابط کاربری و تجربه کاربری مدرن.
+
+---
+
+## سوابق شغلی
+
+### **توسعه‌دهنده فرانت‌اند ارشد** | شرکت نوآوری دیجیتال | تهران
+*فروردین ۱۴۰۲ - اکنون*
+- طراحی و توسعه رابط کاربری برای پلتفرم تجارت الکترونیک
+- بهینه‌سازی عملکرد وب‌سایت تا ۴۰٪
+- همکاری با تیم UX/UI برای پیاده‌سازی طراحی‌های جدید
+- **تکنولوژی‌ها:** React, TypeScript, Tailwind CSS, Next.js
+
+### **توسعه‌دهنده فرانت‌اند** | تک استارتاپ | کرج
+*مهر ۱۴۰۰ - اسفند ۱۴۰۱*
+- توسعه کامپوننت‌های قابل استفاده مجدد با Vue.js
+- پیاده‌سازی طراحی واکنش‌گرا برای دستگاه‌های مختلف
+- **تکنولوژی‌ها:** Vue.js, JavaScript, SCSS, Vuetify
+
+---
+
+## تحصیلات
+
+**کارشناسی مهندسی کامپیوتر** | دانشگاه علم و صنعت | تهران | ۱۳۹۶-۱۴۰۰
+- معدل: ۱۷.۵/۲۰
+- پروژه پایان‌نامه: "طراحی و پیاده‌سازی پلتفرم یادگیری آنلاین"
+
+---
+
+## مهارت‌های فنی
+
+**زبان‌های برنامه‌نویسی:** JavaScript, TypeScript, HTML, CSS  
+**فریم‌ورک‌ها:** React, Vue.js, Next.js, Angular  
+**ابزارها:** Webpack, Vite, ESLint, Prettier  
+**طراحی:** Tailwind CSS, Bootstrap, Material-UI  
+**نسخه‌بندی:** Git, GitHub, GitLab
+
+---
+
+## پروژه‌های شخصی
+- **فروشگاه آنلاین:** پلتفرم تجارت الکترونیک با React و Node.js
+- **اپلیکیشن مدیریت وظایف:** Progressive Web App با Vue.js
+
+---
+
+## Resume 4: فاطمه محمدی (Fatemeh Mohammadi) - Tehran - Backend Developer
+**Format: Farsi Resume**
+
+---
+
+# فاطمه محمدی
+## توسعه‌دهنده بک‌اند
+
+**ایمیل:** fatemeh.mohammadi@email.com  
+**تلفن:** ۰۹۱۵ ۱۲۳ ۴۵۶۷+  
+**آدرس:** تهران، ایران  
+**گیت‌هاب:** github.com/fatemeh-mohammadi
+
+---
+
+## درباره من
+توسعه‌دهنده بک‌اند با ۴ سال تجربه در Node.js، Python و طراحی سیستم‌های مقیاس‌پذیر. تخصص در API Development و معماری میکروسرویس.
+
+---
+
+## تجربه کاری
+
+**توسعه‌دهنده بک‌اند ارشد** | فین‌تک پارس | تهران  
+*خرداد ۱۴۰۱ - اکنون*
+- طراحی و توسعه API برای سیستم پرداخت آنلاین
+- پیاده‌سازی معماری میکروسرویس با Docker و Kubernetes
+- بهینه‌سازی پایگاه داده و کاهش زمان پاسخ تا ۵۰٪
+- تکنولوژی‌ها: Node.js, Express, PostgreSQL, Redis, Docker
+
+**توسعه‌دهنده بک‌اند** | شرکت داده‌پردازی | تهران  
+*مهر ۱۳۹۹ - خرداد ۱۴۰۱*
+- توسعه سیستم مدیریت محتوا با Django
+- طراحی و پیاده‌سازی REST API
+- همکاری با تیم فرانت‌اند برای یکپارچه‌سازی سیستم
+- تکنولوژی‌ها: Python, Django, MySQL, Celery
+
+---
+
+## تحصیلات
+
+**کارشناسی ارشد مهندسی کامپیوتر** | دانشگاه صنعتی شریف | تهران  
+*۱۳۹۸-۱۴۰۰*
+- گرایش: سیستم‌های نرم‌افزاری
+- پایان‌نامه: "بهینه‌سازی عملکرد پایگاه داده در سیستم‌های توزیع‌شده"
+
+**کارشناسی مهندسی کامپیوتر** | دانشگاه تهران | ۱۳۹۴-۱۳۹۸
+
+---
+
+## مهارت‌های تکنیکی
+
+- **زبان‌های برنامه‌نویسی:** JavaScript, Python, Java, Go
+- **فریم‌ورک‌ها:** Node.js, Express, Django, FastAPI
+- **پایگاه داده:** PostgreSQL, MongoDB, Redis, Elasticsearch
+- **ابزار DevOps:** Docker, Kubernetes, AWS, CI/CD
+- **سایر:** GraphQL, WebSocket, Message Queues
+
+---
+
+## گواهینامه‌ها
+- AWS Solutions Architect Associate
+- MongoDB Certified Developer
+
+---
+
+## Resume 5: سارا کریمی (Sara Karimi) - Isfahan - UI/UX Designer
+**Format: Farsi Creative Resume**
+
+---
+
+# سارا کریمی
+## طراح UI/UX
+
+**📧** sara.karimi@email.com  
+**📱** +۹۸ ۹۳۶ ۱۲۳ ۴۵۶۷  
+**📍** اصفهان، ایران  
+**🌐** behance.net/sarakarimi  
+**💼** dribbble.com/sarakarimi
+
+---
+
+## ✨ درباره من
+طراح خلاق UI/UX با ۳ سال تجربه در طراحی تجربه کاربری مدرن و کاربرپسند. متخصص در Design Thinking و User Research.
+
+---
+
+## 🎨 تجربه شغلی
+
+### **طراح UI/UX ارشد** | آژانس دیجیتال مارکتینگ | اصفهان
+*دی ۱۴۰۱ - اکنون*
+- طراحی رابط کاربری برای ۱۰+ پروژه موبایل و وب
+- انجام User Research و Usability Testing
+- همکاری با تیم‌های توسعه برای پیاده‌سازی طراحی‌ها
+- افزایش نرخ تبدیل تا ۳۰٪ در پروژه‌های e-commerce
+
+### **طراح گرافیک و UI** | استودیو خلاق | اصفهان
+*شهریور ۱۴۰۰ - آذر ۱۴۰۱*
+- طراحی هویت بصری برای برندهای مختلف
+- ایجاد پروتوتایپ‌های تعاملی با Figma
+- طراحی بنرهای تبلیغاتی و مواد بازاریابی
+
+---
+
+## 🎓 تحصیلات
+
+**کارشناسی طراحی گرافیک** | دانشگاه هنر اصفهان | اصفهان  
+*۱۳۹۶-۱۴۰۰*
+- طراحی محور کاربر
+- تایپوگرافی و طراحی بصری
+- پروژه پایانی: "طراحی اپلیکیشن تور مجازی اصفهان"
+
+---
+
+## 🛠️ مهارت‌های نرم‌افزاری
+
+**طراحی UI/UX:** Figma, Adobe XD, Sketch  
+**گرافیک:** Photoshop, Illustrator, After Effects  
+**پروتوتایپ:** InVision, Principle, Framer  
+**سایر:** HTML/CSS, Webflow, Notion
+
+---
+
+## 🏆 پروژه‌های برجسته
+- **اپلیکیشن فود دلیوری:** طراحی کامل UX/UI - ۵۰K+ کاربر
+- **وب‌سایت فروشگاهی:** بازطراحی و بهبود تجربه کاربری
+- **سیستم مدیریت املاک:** طراحی داشبورد پیچیده
+
+---
+
+## Resume 6: محمد رستمی (Mohammad Rostami) - Mashhad - DevOps Engineer
+**Format: Farsi Technical Resume**
+
+---
+
+# محمد رستمی
+## مهندس DevOps
+
+**Email:** mohammad.rostami@email.com  
+**Phone:** +۹۸ ۹۱۷ ۲۳۴ ۵۶۷۸  
+**Location:** مشهد، ایران  
+**LinkedIn:** linkedin.com/in/mohammad-rostami  
+**GitHub:** github.com/mohammad-rostami
+
+---
+
+## خلاصه تخصصی
+مهندس DevOps با ۵+ سال تجربه در اتوماسیون، CI/CD، و مدیریت زیرساخت ابری. متخصص در کنترل container و orchestration.
+
+---
+
+## تجربه کاری
+
+**مهندس DevOps ارشد** | شرکت فناوری اطلاعات | مشهد  
+*بهمن ۱۴۰۰ - اکنون*
+- طراحی و پیاده‌سازی CI/CD pipeline برای ۲۰+ پروژه
+- مدیریت کلاستر Kubernetes برای محیط production
+- کاهش زمان deployment از ۲ ساعت به ۱۰ دقیقه
+- مدیریت زیرساخت AWS شامل EC2, RDS, S3, CloudFormation
+- **تکنولوژی‌ها:** Docker, Kubernetes, Jenkins, Terraform, AWS, Prometheus
+
+**مهندس سیستم** | شرکت نرم‌افزاری پردازش | مشهد  
+*مرداد ۱۳۹۸ - دی ۱۴۰۰*
+- مدیریت سرورهای Linux (CentOS, Ubuntu)
+- پیاده‌سازی monitoring و logging با ELK Stack
+- بهینه‌سازی عملکرد سیستم و troubleshooting
+- **تکنولوژی‌ها:** Linux, Bash, Python, Elasticsearch, Logstash, Kibana
+
+---
+
+## تحصیلات
+
+**کارشناسی مهندسی کامپیوتر** | دانشگاه فردوسی مشهد | مشهد  
+*۱۳۹۴-۱۳۹۸*
+- گرایش: سیستم‌های کامپیوتری
+- پروژه پایانی: "خودکارسازی deployment با Docker و Ansible"
+
+---
+
+## مهارت‌های تکنیکی
+
+**Container & Orchestration:** Docker, Kubernetes, Docker Swarm  
+**CI/CD:** Jenkins, GitLab CI, GitHub Actions  
+**Cloud Platforms:** AWS, Google Cloud, Azure  
+**Infrastructure as Code:** Terraform, Ansible, CloudFormation  
+**Monitoring:** Prometheus, Grafana, ELK Stack  
+**Scripting:** Bash, Python, PowerShell  
+**Version Control:** Git, GitLab, GitHub
+
+---
+
+## گواهینامه‌ها
+- AWS Certified Solutions Architect
+- Certified Kubernetes Administrator (CKA)
+- Docker Certified Associate
+
+---
+
+## Resume 7: Nima Farahani (Karaj) - Mobile Developer
+**Format: Minimal Professional**
+
+---
+
+**NIMA FARAHANI**  
+Mobile Application Developer  
+nima.farahani@email.com | +98 918 345 6789  
+Karaj, Iran | github.com/nimafarahani
+
+---
+
+**EXPERIENCE**
+
+**Senior Mobile Developer** | MobileFirst Solutions | Tehran | 2021 - Present
+- Developed 5+ mobile applications using React Native and Flutter
+- Published apps with 100K+ downloads on Google Play and App Store
+- Integrated payment gateways and third-party APIs
+- Collaborated with design team to implement pixel-perfect UI/UX
+
+**Mobile Developer** | TechStartup | Karaj | 2019 - 2021
+- Built cross-platform mobile apps for e-commerce and fintech
+- Implemented offline functionality and data synchronization
+- Optimized app performance and reduced crash rates by 40%
+
+---
+
+**EDUCATION**
+
+**Bachelor of Software Engineering** | University of Tehran | 2015-2019
+- Focus: Mobile Computing and Software Architecture
+- Final Project: "Location-based Social Networking App"
+
+---
+
+**SKILLS**
+
+**Mobile Development:** React Native, Flutter, Java (Android), Swift (iOS)  
+**Programming Languages:** JavaScript, TypeScript, Dart, Java, Swift  
+**Backend:** Node.js, Firebase, REST APIs, GraphQL  
+**Tools:** Xcode, Android Studio, VS Code, Git  
+**Databases:** SQLite, Realm, Firebase Firestore
+
+---
+
+**PROJECTS**
+
+- **Food Delivery App:** Full-stack mobile application with real-time tracking
+- **Fitness Tracker:** Cross-platform app with health data integration
+- **E-commerce Mobile App:** Shopping platform with payment integration
+
+---
+
+**CERTIFICATIONS**
+- Google Associate Android Developer
+- Meta React Native Specialist
+
+---
+
+## Resume 8: Parisa Taheri (Tehran) - Product Manager
+**Format: Executive Style**
+
+---
+
+# PARISA TAHERI
+## Product Manager
+
+**Professional Contact**  
+Email: parisa.taheri@email.com  
+Phone: +98 912 567 8901  
+Location: Tehran, Iran  
+LinkedIn: linkedin.com/in/parisataheri
+
+---
+
+## EXECUTIVE SUMMARY
+
+Results-driven Product Manager with 6+ years of experience leading cross-functional teams to deliver innovative digital products. Proven track record of launching successful products that drive user engagement and revenue growth. Expert in Agile methodologies, user research, and data-driven decision making.
+
+---
+
+## PROFESSIONAL EXPERIENCE
+
+### **Senior Product Manager** | TechGiant Corp | Tehran | 2020 - Present
+
+**Product Leadership & Strategy**
+- Lead product development for B2B SaaS platform serving 50K+ businesses
+- Increased user retention by 45% through feature optimization and UX improvements
+- Managed product roadmap and prioritized features based on customer feedback and business goals
+- Collaborated with engineering, design, and marketing teams to deliver high-quality products
+
+**Key Achievements:**
+- Launched 3 major product features resulting in 25% revenue increase
+- Reduced customer churn by 30% through improved onboarding experience
+- Led market research initiatives that identified new product opportunities
+
+### **Product Manager** | StartupTech | Tehran | 2018 - 2020
+
+**Product Development & Growth**
+- Managed entire product lifecycle from conception to launch
+- Conducted user interviews and usability testing to validate product concepts
+- Analyzed product metrics and KPIs to drive continuous improvement
+- Coordinated with stakeholders to align product vision with business objectives
+
+---
+
+## EDUCATION
+
+**Master of Business Administration (MBA)** | Tehran University | 2016-2018
+- Concentration: Technology Management and Innovation
+- Thesis: "Digital Transformation in Iranian Tech Industry"
+
+**Bachelor of Industrial Engineering** | Sharif University of Technology | 2012-2016
+- Focus: Systems Engineering and Operations Research
+
+---
+
+## CORE COMPETENCIES
+
+**Product Management:** Product Strategy, Roadmap Planning, Feature Prioritization  
+**Analytics:** Google Analytics, Mixpanel, A/B Testing, KPI Analysis  
+**Methodologies:** Agile, Scrum, Lean Startup, Design Thinking  
+**Tools:** JIRA, Confluence, Figma, Miro, SQL  
+**Research:** User Research, Market Analysis, Competitive Intelligence
+
+---
+
+## CERTIFICATIONS & TRAINING
+
+- Certified Scrum Product Owner (CSPO)
+- Google Analytics Certified
+- Product Management Certificate - Stanford University
+
+---
+
+## Resume 9: Behrouz Moradi (Tabriz) - Cybersecurity Specialist
+**Format: Technical Security Resume**
+
+---
+
+# BEHROUZ MORADI
+## Cybersecurity Specialist
+
+**Contact Information**  
+📧 behrouz.moradi@email.com  
+📱 +98 914 234 5678  
+📍 Tabriz, Iran  
+🔗 linkedin.com/in/behrouzmoradi  
+🌐 cybersec-blog.com/behrouzmoradi
+
+---
+
+## PROFESSIONAL PROFILE
+
+Cybersecurity specialist with 4+ years of experience in network security, penetration testing, and incident response. Certified ethical hacker with expertise in vulnerability assessment and security architecture design. Passionate about protecting digital assets and staying ahead of emerging threats.
+
+---
+
+## WORK EXPERIENCE
+
+### **Cybersecurity Analyst** | SecureNet Solutions | Tehran | 2022 - Present
+
+**Security Operations & Incident Response**
+- Monitor security incidents and conduct threat analysis using SIEM tools
+- Perform vulnerability assessments and penetration testing on client networks
+- Develop security policies and procedures for enterprise clients
+- Investigate security breaches and provide incident response support
+- **Technologies:** Wireshark, Nessus, Metasploit, Splunk, Nmap
+
+### **Network Security Engineer** | TechGuard Co. | Tabriz | 2020 - 2022
+
+**Network Security Implementation**
+- Configured and maintained firewalls, IDS/IPS systems, and VPN solutions
+- Conducted security audits and compliance assessments
+- Implemented network segmentation and access control policies
+- Provided security training to staff and management
+- **Technologies:** Cisco ASA, Palo Alto, pfSense, Snort, OpenVPN
+
+---
+
+## EDUCATION
+
+**Master of Computer Engineering** | University of Tabriz | 2018-2020
+- Specialization: Information Security and Cryptography
+- Thesis: "Advanced Persistent Threat Detection in Enterprise Networks"
+- GPA: 3.9/4.0
+
+**Bachelor of Computer Engineering** | Sahand University | Tabriz | 2014-2018
+- Focus: Network Security and Computer Systems
+
+---
+
+## CERTIFICATIONS
+
+- **Certified Ethical Hacker (CEH)** | EC-Council | 2021
+- **CompTIA Security+** | CompTIA | 2020
+- **Certified Information Systems Security Professional (CISSP)** | ISC² | 2023
+
+---
+
+## TECHNICAL SKILLS
+
+**Security Tools:** Wireshark, Nessus, Metasploit, Burp Suite, Nmap, Nikto  
+**SIEM Platforms:** Splunk, IBM QRadar, ArcSight  
+**Firewalls:** Cisco ASA, Palo Alto, Fortinet, pfSense  
+**Operating Systems:** Linux (Kali, Ubuntu, CentOS), Windows Server  
+**Programming:** Python, Bash, PowerShell, C++  
+**Frameworks:** NIST, ISO 27001, OWASP
+
+---
+
+## PROJECTS
+
+- **Enterprise Security Assessment:** Led comprehensive security audit for 500+ employee organization
+- **Incident Response Framework:** Developed IR procedures reducing response time by 60%
+- **Threat Intelligence Platform:** Built automated threat detection system using Python and ML
+
+---
+
+## Resume 10: Amir Hosseini (Tehran) - Full Stack Developer
+**Format: Developer Portfolio Style**
+
+---
+
+# AMIR HOSSEINI
+## Full Stack Developer
+
+**Get in Touch**  
+✉️ amir.hosseini.dev@email.com  
+📞 +98 933 456 7890  
+🌍 Tehran, Iran  
+💼 portfolio.amirhosseini.dev  
+👨‍💻 github.com/amirhosseini-dev  
+💼 linkedin.com/in/amirhosseini-dev
+
+---
+
+## 👨‍💻 ABOUT ME
+
+Full stack developer with 3+ years of experience building scalable web applications. Passionate about clean code, modern frameworks, and creating exceptional user experiences. Strong advocate for test-driven development and continuous learning.
+
+---
+
+## 🚀 EXPERIENCE
+
+### **Full Stack Developer** | DigitalCraft Agency | Tehran
+*April 2022 - Present*
+
+**Frontend Development**
+- Built responsive web applications using React and Next.js
+- Implemented modern UI components with TypeScript and Tailwind CSS
+- Optimized application performance achieving 90+ Lighthouse scores
+- Collaborated with designers to create pixel-perfect implementations
+
+**Backend Development**
+- Developed RESTful APIs using Node.js and Express
+- Designed and implemented database schemas with PostgreSQL
+- Integrated third-party services and payment gateways
+- Implemented authentication and authorization systems
+
+**DevOps & Deployment**
+- Set up CI/CD pipelines with GitHub Actions
+- Deployed applications on AWS and Vercel
+- Managed Docker containers and database migrations
+
+### **Junior Web Developer** | WebSolutions | Tehran
+*September 2020 - March 2022*
+
+- Developed dynamic websites using PHP and MySQL
+- Created responsive designs with Bootstrap and jQuery
+- Collaborated with team using Git and Agile methodologies
+- Maintained and updated existing web applications
+
+---
+
+## 🎓 EDUCATION
+
+**Bachelor of Computer Science** | Iran University of Science and Technology | Tehran
+*2016-2020*
+- Relevant Coursework: Web Development, Database Design, Software Engineering
+- Capstone Project: "Real-time Chat Application with WebSocket"
+
+---
+
+## 🛠️ TECHNICAL SKILLS
+
+**Frontend Technologies**
+- Languages: JavaScript, TypeScript, HTML5, CSS3
+- Frameworks: React, Next.js, Vue.js
+- Styling: Tailwind CSS, Styled Components, SCSS
+- State Management: Redux, Context API, Vuex
+
+**Backend Technologies**
+- Languages: Node.js, Python, PHP
+- Frameworks: Express.js, Django, Laravel
+- Databases: PostgreSQL, MySQL, MongoDB
+- APIs: REST, GraphQL, WebSocket
+
+**DevOps & Tools**
+- Cloud: AWS, Google Cloud, Vercel
+- Containerization: Docker, Docker Compose
+- CI/CD: GitHub Actions, GitLab CI
+- Version Control: Git, GitHub, GitLab
+- Testing: Jest, Cypress, PHPUnit
+
+---
+
+## 🏆 FEATURED PROJECTS
+
+### **E-commerce Platform** | [github.com/amirhosseini-dev/ecommerce]
+- Full-stack e-commerce solution with React and Node.js
+- Implemented shopping cart, payment processing, and admin dashboard
+- **Tech Stack:** React, Node.js, PostgreSQL, Stripe API, AWS S3
+
+### **Task Management App** | [github.com/amirhosseini-dev/taskmanager]
+- Collaborative task management application with real-time updates
+- Features include team collaboration, file sharing, and notifications
+- **Tech Stack:** Next.js, Express, MongoDB, Socket.io, JWT
+
+### **Weather Dashboard** | [github.com/amirhosseini-dev/weather-dashboard]
+- Responsive weather application with location-based forecasts
+- Integrated multiple weather APIs and implemented data visualization
+- **Tech Stack:** Vue.js, Chart.js, OpenWeatherMap API, Tailwind CSS
+
+---
+
+## 📚 CONTINUOUS LEARNING
+
+- **AWS Certified Developer Associate** | In Progress
+- **GraphQL Certification** | Apollo GraphQL | 2023
+- **React Advanced Patterns** | Frontend Masters | 2022
+
+---
+
+## 🌟 ACHIEVEMENTS
+
+- Contributed to 5+ open-source projects on GitHub
+- Mentor at Tehran Web Development Bootcamp
+- Speaker at React Tehran Meetup 2023
+- Won 2nd place in Tehran Hackathon 2022
+
+---
