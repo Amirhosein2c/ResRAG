@@ -59,7 +59,7 @@ query them.
     - Use an embedding model (e.g., text-embedding-3-small) to vectorize CVs and queries, 
     - Use an LLM to generate human-readable summaries of match relevance
 
-
+---
 ### Deliverables
 - A GitHub repo (or ZIP) containing:
     - Dockerize Project
