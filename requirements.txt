@@ -1,8 +1,10 @@
 langchain 
+unstructured
+unstructured[all-docs]
 pypdf2 
 python-dotenv 
 streamlit
-python-docx
+docx2txt2
 bs4
 markdown
 
