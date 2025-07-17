@@ -1,0 +1,20 @@
+langchain 
+pypdf2 
+python-dotenv 
+streamlit
+python-docx
+bs4
+markdown
+
+#  import except  # IGNORE
+#  from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
+#  from langchain_community.text_splitter import RecursiveCharacterTextSplitter
+#  from langchain_community.embeddings import OpenAIEmbeddings
+#  from langchain_community.vectorstores import Chroma
+#  from langchain_community.chains import RetrievalQA
+#  from langchain_community.llms import OpenAI
+ 
+#  st.set_page_config(page_title="ResRAG", page_icon=":books:")
+ 
+#  if "vectorstore" not in st.session_state:
+#      st.session_state.vectorstore = None
