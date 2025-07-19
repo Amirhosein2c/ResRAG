@@ -207,4 +207,4 @@ __marimo__/
 DBPATH/
 
 # Temp Directory for storing uploaded resumes
-RESUMES/
+DATA/
