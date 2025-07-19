@@ -25,93 +25,46 @@ from langchain.prompts import ChatPromptTemplate, PromptTemplate
 
 CHROMA_PATH = "./DBPATH"
 
-# PROMPT_TEMPLATE = """
-# Answer the question based only on the following context:
-
-# {context}
-
-# ---
-
-# Answer the question based on the above context: {question}
-# """
-
 PROMPT_TEMPLATE = """
+You are an HR assistant analyzing resumes against a job search query.
 
-You are an HR assistant. Your task is to analyzes resumes and explains how well they match the job search queries {question}
-. 
+SEARCH QUERY: {question}
 
-You receive the following context: 
-
+RESUME CONTEXT: 
 {context}
 
-and must evaluate how relevant each resume is to the search requirements {question}.
+INSTRUCTIONS:
+1. Analyze EACH resume separately - do not mix information between resumes
+2. For each resume, extract ONLY the information that directly relates to the search query
+3. Score each resume independently based on how well it matches the query requirements
+4. Be specific about which skills/experiences you found in each individual resume
 
-When given a search query: 
+RESPONSE FORMAT:
+For each resume found in the context, respond with:
 
-{question}
+**Resume Match #[number]**
+**Source:** [filename from context]
+**Match Score:** [1-10]/10
+**Key Strengths:** [2-3 specific qualifications found in THIS resume only]
+**Match Explanation:** [Why THIS specific resume matches/doesn't match the query]
+**Experience Level:** [Junior/Mid/Senior based on THIS resume's content]
+**Location:** [If mentioned in THIS resume, look for their most recent location]
 
-and top 5 resume content: 
+SCORING GUIDELINES:
+- 9-10: Excellent match - meets most/all requirements
+- 7-8: Good match - meets key requirements with minor gaps  
+- 5-6: Moderate match - some relevant skills but missing important ones
+- 3-4: Weak match - few relevant qualifications
+- 1-2: Poor match - minimal or no relevant qualifications
 
-{context}
+CRITICAL RULES:
+- Use ONLY information actually present in each individual resume
+- Do NOT combine or mix information from different resumes
+- If information is not clearly stated in a resume, do not assume it exists
+- Keep explanations concise and factual
+- Focus only on skills/experiences that relate to the search query
 
-you must:
-
-Analyze how well each of the 3 resume matches the query requirements.
-Provide a relevance score (1-10).
-Explain why each resume is a good or poor match.
-Highlight the most relevant qualifications.
-
-Response Format
-For each matching resume, respond exactly like this:
-Resume Match #[number]
-Match Score: [1-10]/10
-Key Strengths: [List 2-3 most relevant qualifications from the resume]
-Match Explanation: [2-3 sentences explaining why this resume matches or doesn't match the query]
-Location: [If mentioned in resume]
-Experience Level: [Junior/Mid/Senior based on resume content]
-
-Scoring Guidelines
-
-9-10: Excellent match - meets most/all requirements
-7-8: Good match - meets key requirements with minor gaps
-5-6: Moderate match - some relevant skills but missing important ones
-3-4: Weak match - few relevant qualifications
-1-2: Poor match - minimal or no relevant qualifications
-
-Important Rules!
-
-Only and only use information actually present in the resume content:
-
-{context}
-
-Be specific about which skills/experiences match the query:
-
-{question}
-
-Example
-Query: "Looking for a data scientist with Python and TensorFlow experience in Germany"
-Resume contains: Python programming, machine learning projects, TensorFlow usage, located in Berlin
-Your response should be:
-Resume Match #1
-Match Score: 8/10
-Key Strengths: Python programming experience, TensorFlow projects, machine learning background
-Match Explanation: Strong match for data scientist role. Resume shows Python programming skills and specific TensorFlow experience through ML projects. Located in Berlin, Germany which meets location requirement.
-Location: Berlin, Germany
-Experience Level: Mid-level
-
-
-Pay attention:
-
-Help the user based only on the following context:
-
-{context}
-
----
-
-Answer the question based on the above context: 
-
-{question}
-
+Begin your analysis:
 """
 
 
@@ -143,24 +96,24 @@ def oldstyle_reader(uploaded_files):
                 text += page.extract_text()
             # print(f"/n/n PDF TEXT BEFORE CLEANING: {text}")
             text = clean_text_from_raw_pdf(text)
-            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
 
 
         elif uploaded_file.name.endswith('.txt'):
             text = uploaded_file.read().decode("utf-8")
-            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
 
         elif uploaded_file.name.endswith('.docx') :
             text = docx2txt2.extract_text(uploaded_file)
-            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
             
         elif uploaded_file.name.endswith('.md'):
             text = uploaded_file.read().decode("utf-8")
             text = markdown_to_text(text)
-            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
 
         else:
@@ -174,8 +127,8 @@ def oldstyle_reader(uploaded_files):
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=500,
+        chunk_size=2500,
+        chunk_overlap=1000,
         length_function=len,
         is_separator_regex=False,
     )
@@ -253,13 +206,8 @@ def main():
 
     st.header("ResRAG App!")
 
-    # clear_database()
+    clear_database()
     # os.makedirs(CHROMA_PATH)
-
-    # Add a button to clear the database only when needed
-    if st.sidebar.button("Reset Resume Database"):
-        clear_database()
-        os.makedirs(CHROMA_PATH, exist_ok=True)
 
     # Ensure the DB directory exists
     if not os.path.exists(CHROMA_PATH):
@@ -286,9 +234,15 @@ def main():
         if query_text:
 
             # Search the DB.
-            results = vector_db.similarity_search_with_score(query_text, k=3)
+            results = vector_db.similarity_search_with_score(query_text, k=5)
 
-            context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+            # context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+
+            context_text = ""
+            for i, (doc, score) in enumerate(results, 1):
+                source = doc.metadata.get("source", f"Resume_{i}")
+                context_text += f"RESUME {i} (Source: {source}):\n{doc.page_content}\n\n---\n\n"
+
             prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
             prompt = prompt_template.format(context=context_text, question=query_text)
             # print(prompt)
