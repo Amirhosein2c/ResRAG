@@ -66,3 +66,7 @@ query them.
     - Requirements file (e.g., requirements.txt)
     - README with setup and usage instructions
     - A small sample dataset (3–5 anonymized CVs) along with corresponding queries, intended for demonstration purposes.
+
+
+
+
