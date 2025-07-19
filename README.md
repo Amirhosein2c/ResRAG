@@ -73,61 +73,63 @@ query them.
 
 ## Local Installation:
 
-1. First install 'ollama':
+1. First install `ollama`:
 
 Download and extract the package:
 
-'''
+```
 curl -L https://ollama.com/download/ollama-linux-amd64.tgz -o ollama-linux-amd64.tgz
 sudo tar -C /usr -xzf ollama-linux-amd64.tgz
-'''
+```
 
 Start Ollama:
 
-'''
+```
 ollama serve
-'''
+```
 
 In another terminal, verify that Ollama is running:
 
-'''
+```
 ollama -v
-'''
+```
 
-Then pull 'llama3.2'
+Then pull `llama3.2`
 
-'''
+```
 ollama pull llama3.2
-'''
+```
 
 2. Then clone the git reporistory:
 
-'''
+```
 git clone git@github.com:Amirhosein2c/ResRAG.git 
-'''
+```
 
-and enter the 'ResRAG' directory
+and enter the `ResRAG` directory
 
-3. Now make a conda environment named 'ResRag':
+3. Now make a conda environment named `ResRag`:
 
-'''
+```
 conda create --name ResRag python=3.10
-'''
+```
 
 4. install the requirements using the following command:
 
-'''
+```
 pip install -r ./requirements.txt
-'''
+```
 
 5. Run the app using the command below:
 
-'''
+```
 streamlit run ./app.py
-'''
+```
 
-6. Upload dummy resume files from './RESUME' directory.
+6. Upload dummy resume files from `./RESUME` directory.
 
 7. Put your query in the dedicated box and check the results.
 
-8. For running the app using 'Docker' checkout to the 'docker' branch of the git repository and follow the instructions in the related README_DOCKER.md file.
+## Docker Run:
+
+For running the app using `Docker` checkout to the `docker` branch of the git repository and follow the instructions in the related `README_DOCKER.md` file.
