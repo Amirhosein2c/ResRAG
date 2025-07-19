@@ -1,4 +1,8 @@
-langchain 
+onnxruntime
+langchain
+langchain-community 
+langchain-ollama
+langchain-chroma
 unstructured
 unstructured[all-docs]
 pypdf2 
