@@ -1,0 +1,33 @@
+# Ignore these files and directories when building the Docker image
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.env
+.git/
+.gitignore
+README.md
+.DS_Store
+.dockerignore
+Dockerfile
+docker-compose.yml
+setup.sh
+
+# Don't copy the data directories (they'll be mounted as volumes)
+DBPATH/
+DATA/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+.DS_Store
