@@ -206,7 +206,7 @@ def main():
 
     st.header("ResRAG App!")
 
-    clear_database()
+    # clear_database()
     # os.makedirs(CHROMA_PATH)
 
     # Ensure the DB directory exists
