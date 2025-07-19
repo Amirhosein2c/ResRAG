@@ -20,60 +20,6 @@ from langchain.prompts import ChatPromptTemplate
 CHROMA_PATH = "./DBPATH"
 DATA_PATH = "./DATA"
 
-# PROMPT_TEMPLATE = """
-# You are an HR assistant analyzing resumes against a job search query.
-
-# SEARCH QUERY: {question}
-
-# RESUME CONTEXT: 
-# {context}
-
-# INSTRUCTIONS:
-# 1. Analyze EACH resume separately - do not mix information between resumes
-# 2. For each resume, extract ONLY the information that directly relates to the search query
-# 3. Score each resume independently based on how well it matches the query requirements
-# 4. Be specific about which skills/experiences you found in each individual resume
-# 5. Identify and highlight any mismatches or gaps in requirements
-
-# RESPONSE FORMAT:
-# For each resume found in the context, respond with:
-
-# **Resume Match #[number]**
-# **Source:** [filename from context]
-# **Match Score:** [1-10]/10
-# **Key Strengths:** [2-3 specific qualifications found in THIS resume only]
-# **Match Explanation:** [Why THIS specific resume matches/doesn't match the query]
-# **Experience Level:** [Junior/Mid/Senior based on THIS resume's content]
-# **Location:** [If mentioned in THIS resume]
-# **Potential Mismatches:** [List any requirements from the query that this resume does NOT meet, such as location, degree, specific skills, experience level, etc.]
-
-# SCORING GUIDELINES:
-# - 9-10: Excellent match - meets most/all requirements
-# - 7-8: Good match - meets key requirements with minor gaps  
-# - 5-6: Moderate match - some relevant skills but missing important ones
-# - 3-4: Weak match - few relevant qualifications
-# - 1-2: Poor match - minimal or no relevant qualifications
-
-# CRITICAL RULES:
-# - Use ONLY information actually present in each individual resume
-# - Do NOT combine or mix information from different resumes
-# - If information is not clearly stated in a resume, do not assume it exists
-# - Keep explanations concise and factual
-# - Focus only on skills/experiences that relate to the search query
-# - Always identify mismatches even if the overall score is high
-
-# After analyzing all individual resumes, provide:
-
-# **SUMMARY ANALYSIS**
-# **Top Recommended Candidate:** [Best matching resume filename]
-# **Recommendation Score:** [Score of the best candidate]/10
-# **Why This is the Best Match:** [2-3 key reasons why this resume stands out above others]
-# **Main Strengths:** [Top 3 strengths of the recommended candidate]
-# **Areas of Concern:** [Any significant mismatches or gaps in the top candidate, if any]
-
-# Begin your analysis:
-# """
-
 
 PROMPT_TEMPLATE = """
 You are an HR assistant analyzing resumes against a job search query. Before scoring, you must think carefully about what the role actually requires.
@@ -161,7 +107,7 @@ def create_download_link(file_path, file_name):
         href = f'<a href="data:{mime_type};base64,{b64}" download="{file_name}" target="_blank">📄 {file_name}</a>'
         return href
     except Exception as e:
-        return f"❌ File not found: {file_name}"
+        return f"File not found: {file_name}"
 
 
 def save_uploaded_file(uploaded_file):
