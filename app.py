@@ -37,27 +37,29 @@ CHROMA_PATH = "./DBPATH"
 
 PROMPT_TEMPLATE = """
 
-You are an HR assistant that analyzes resumes and explains how well they match job search queries. 
+You are an HR assistant. Your task is to analyzes resumes and explains how well they match the job search queries {question}
+. 
+
 You receive the following context: 
 
+{context}
 
-
-and must evaluate how relevant each resume is to the search requirements.
+and must evaluate how relevant each resume is to the search requirements {question}.
 
 When given a search query: 
 
 {question}
 
-and resume content: 
+and top 5 resume content: 
 
 {context}
 
 you must:
 
-Analyze how well each resume matches the query requirements
-Provide a relevance score (1-10)
-Explain why each resume is a good or poor match
-Highlight the most relevant qualifications
+Analyze how well each of the 3 resume matches the query requirements.
+Provide a relevance score (1-10).
+Explain why each resume is a good or poor match.
+Highlight the most relevant qualifications.
 
 Response Format
 For each matching resume, respond exactly like this:
@@ -76,19 +78,15 @@ Scoring Guidelines
 3-4: Weak match - few relevant qualifications
 1-2: Poor match - minimal or no relevant qualifications
 
-Important Rules
+Important Rules!
 
-Only use information actually present in the resume content:
+Only and only use information actually present in the resume content:
 
 {context}
 
 Be specific about which skills/experiences match the query:
 
 {question}
-
-If location is important in the query, mention it in your analysis
-Be honest about gaps or missing qualifications
-Focus on technical skills, experience, and education mentioned in both query and resume
 
 Example
 Query: "Looking for a data scientist with Python and TensorFlow experience in Germany"
@@ -145,24 +143,24 @@ def oldstyle_reader(uploaded_files):
                 text += page.extract_text()
             # print(f"/n/n PDF TEXT BEFORE CLEANING: {text}")
             text = clean_text_from_raw_pdf(text)
-            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
 
 
         elif uploaded_file.name.endswith('.txt'):
             text = uploaded_file.read().decode("utf-8")
-            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
 
         elif uploaded_file.name.endswith('.docx') :
             text = docx2txt2.extract_text(uploaded_file)
-            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
             
         elif uploaded_file.name.endswith('.md'):
             text = uploaded_file.read().decode("utf-8")
             text = markdown_to_text(text)
-            # st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
+            st.text_area(f"Content of Resume file {uploaded_file.name}", value=text, height=700)
             extracted_texts.append(Document(page_content=text, metadata={"source": str(uploaded_file.name)}))
 
         else:
@@ -176,8 +174,8 @@ def oldstyle_reader(uploaded_files):
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=250,
+        chunk_size=1000,
+        chunk_overlap=500,
         length_function=len,
         is_separator_regex=False,
     )
@@ -250,15 +248,22 @@ def main():
 
     st.set_page_config(
         page_title="ResRAG App.",
-        layout="wide",
         initial_sidebar_state="collapsed",
     )
 
     st.header("ResRAG App!")
 
-    clear_database()
+    # clear_database()
+    # os.makedirs(CHROMA_PATH)
 
-    os.makedirs(CHROMA_PATH)
+    # Add a button to clear the database only when needed
+    if st.sidebar.button("Reset Resume Database"):
+        clear_database()
+        os.makedirs(CHROMA_PATH, exist_ok=True)
+
+    # Ensure the DB directory exists
+    if not os.path.exists(CHROMA_PATH):
+        os.makedirs(CHROMA_PATH, exist_ok=True)
 
     uploaded_files = list()
     uploaded_files = st.file_uploader("Please upload your resume files here!", accept_multiple_files=True)
@@ -281,7 +286,7 @@ def main():
         if query_text:
 
             # Search the DB.
-            results = vector_db.similarity_search_with_score(query_text, k=5)
+            results = vector_db.similarity_search_with_score(query_text, k=3)
 
             context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
             prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
@@ -296,7 +301,7 @@ def main():
             print(formatted_response)
             st.write("Here is the results: ", formatted_response)
 
-            
+
 
 
 if __name__ == "__main__":
