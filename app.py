@@ -15,11 +15,14 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 
-
+# Load environment variables
+load_dotenv()
 
 CHROMA_PATH = "./DBPATH"
 DATA_PATH = "./DATA"
 
+# Configure Ollama host for Docker
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
 PROMPT_TEMPLATE = """
 You are an HR assistant analyzing resumes against a job search query. Before scoring, you must think carefully about what the role actually requires.
@@ -81,8 +84,6 @@ After analyzing all resumes:
 
 Think logically about role requirements and candidate fit. Begin your analysis:
 """
-
-
 
 def create_download_link(file_path, file_name):
     """Create a download link for a file"""
@@ -205,9 +206,13 @@ def split_documents(documents: list[Document]):
 
 
 def add_to_chroma(chunks_with_ids: list[Document]):
-    # Load the existing database.
+    # Load the existing database with Docker-compatible Ollama host
     db = Chroma(
-        persist_directory=CHROMA_PATH, embedding_function=OllamaEmbeddings(model="nomic-embed-text")
+        persist_directory=CHROMA_PATH, 
+        embedding_function=OllamaEmbeddings(
+            model="nomic-embed-text",
+            base_url=OLLAMA_HOST
+        )
     )
 
     # Add or Update the documents.
@@ -306,6 +311,19 @@ def clear_database():
         shutil.rmtree(CHROMA_PATH)
 
 
+def check_ollama_connection():
+    """Check if Ollama is accessible"""
+    try:
+        from langchain_community.llms.ollama import Ollama
+        test_model = Ollama(model="llama3.2", base_url=OLLAMA_HOST)
+        # Try a simple test
+        test_model.invoke("Hello")
+        return True
+    except Exception as e:
+        print(f"Ollama connection error: {e}")
+        return False
+
+
 def main():
     st.set_page_config(
         page_title="ResRAG App.",
@@ -321,8 +339,17 @@ def main():
     if not os.path.exists(DATA_PATH):
         os.makedirs(DATA_PATH, exist_ok=True)
 
-    # Add option to clear data
+    # Check Ollama connection status
     with st.sidebar:
+        st.write("### System Status")
+        if check_ollama_connection():
+            st.success("🟢 Ollama Connected")
+        else:
+            st.error("🔴 Ollama Disconnected")
+            st.write("Make sure Ollama service is running and models are downloaded.")
+        
+        st.write(f"**Ollama Host:** {OLLAMA_HOST}")
+        
         if st.button("Clear Database & Files"):
             clear_database()
             if os.path.exists(DATA_PATH):
@@ -348,63 +375,70 @@ def main():
         )
 
         if query_text:
-            # Search the DB.
-            results = vector_db.similarity_search_with_score(query_text, k=5)
+            try:
+                # Search the DB.
+                results = vector_db.similarity_search_with_score(query_text, k=5)
 
-            context_text = ""
-            for i, (doc, score) in enumerate(results, 1):
-                source = doc.metadata.get("source", f"Resume_{i}")
-                context_text += f"RESUME {i} (Source: {source}):\n{doc.page_content}\n\n---\n\n"
+                context_text = ""
+                for i, (doc, score) in enumerate(results, 1):
+                    source = doc.metadata.get("source", f"Resume_{i}")
+                    context_text += f"RESUME {i} (Source: {source}):\n{doc.page_content}\n\n---\n\n"
 
-            prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
-            prompt = prompt_template.format(context=context_text, question=query_text)
+                prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+                prompt = prompt_template.format(context=context_text, question=query_text)
 
-            model = Ollama(model="llama3.2")
-            response_text = model.invoke(prompt)
+                model = Ollama(model="llama3.2", base_url=OLLAMA_HOST)
+                
+                with st.spinner("Analyzing resumes..."):
+                    response_text = model.invoke(prompt)
 
-            # Extract best match and create download link
-            best_match_link = extract_best_match_from_response(response_text, results)
+                # Extract best match and create download link
+                best_match_link = extract_best_match_from_response(response_text, results)
 
-            sources = [doc.metadata.get("id", None) for doc, _score in results]
-            
-            st.write("### Analysis Results")
-            st.write(response_text)
-            
-            # Display the download link for the best match
-            if best_match_link:
-                st.write("### 📋 Best Match Resume:")
-                st.markdown(best_match_link, unsafe_allow_html=True)
-            else:
-                st.warning("Could not create download link for best match. Check console for debugging info.")
-            
-            # Show all available resume files with download links
-            st.write("### 📁 All Resume Files:")
-            
-            # Get unique documents to avoid duplicates
-            unique_docs = {}
-            for doc, score in results:
-                source = doc.metadata.get("source")
-                if source and source not in unique_docs:
-                    unique_docs[source] = doc
-            
-            if unique_docs:
-                for source, doc in unique_docs.items():
-                    file_path = doc.metadata.get("file_path")
-                    if file_path and os.path.exists(file_path):
-                        link = create_download_link(file_path, source)
-                        st.markdown(f"• {link}", unsafe_allow_html=True)
-                    else:
-                        # Try backup path
-                        backup_path = os.path.join(DATA_PATH, source)
-                        if os.path.exists(backup_path):
-                            link = create_download_link(backup_path, source)
+                sources = [doc.metadata.get("id", None) for doc, _score in results]
+                
+                st.write("### Analysis Results")
+                st.write(response_text)
+                
+                # Display the download link for the best match
+                if best_match_link:
+                    st.write("### 📋 Best Match Resume:")
+                    st.markdown(best_match_link, unsafe_allow_html=True)
+                else:
+                    st.warning("Could not create download link for best match. Check console for debugging info.")
+                
+                # Show all available resume files with download links
+                st.write("### 📁 All Resume Files:")
+                
+                # Get unique documents to avoid duplicates
+                unique_docs = {}
+                for doc, score in results:
+                    source = doc.metadata.get("source")
+                    if source and source not in unique_docs:
+                        unique_docs[source] = doc
+                
+                if unique_docs:
+                    for source, doc in unique_docs.items():
+                        file_path = doc.metadata.get("file_path")
+                        if file_path and os.path.exists(file_path):
+                            link = create_download_link(file_path, source)
                             st.markdown(f"• {link}", unsafe_allow_html=True)
                         else:
-                            st.write(f"• ❌ {source} (file not found)")
-            else:
-                st.warning("No resume files found in results.")
+                            # Try backup path
+                            backup_path = os.path.join(DATA_PATH, source)
+                            if os.path.exists(backup_path):
+                                link = create_download_link(backup_path, source)
+                                st.markdown(f"• {link}", unsafe_allow_html=True)
+                            else:
+                                st.write(f"• ❌ {source} (file not found)")
+                else:
+                    st.warning("No resume files found in results.")
+                
+                st.write(f"**Sources:** {sources}")
             
-            st.write(f"**Sources:** {sources}")
+            except Exception as e:
+                st.error(f"Error processing query: {str(e)}")
+                st.write("Please check if Ollama is running and the required models are downloaded.")
 
 
 if __name__ == "__main__":
